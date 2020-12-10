@@ -43,19 +43,17 @@ function reducer(state, action) {
       };
     case "change choose country to play":
       return {
+        ...state,
         ...{
-          ...state,
-          ...{
-            country: state.country.map((row) => {
-              if (
-                row.firstCity.x === action.cell.x &&
-                row.firstCity.y === action.cell.y
-              ) {
-                row = { ...row, ai: false };
-              }
-              return row;
-            }),
-          },
+          country: state.country.map((row) => {
+            if (
+              row.firstCity.x === action.cell.x &&
+              row.firstCity.y === action.cell.y
+            ) {
+              row = { ...row, ai: false };
+            }
+            return row;
+          }),
         },
         playerStep: "play",
       };
@@ -607,7 +605,7 @@ function TableCell(props) {
       //make table array add solider
       dispatch({ type: "change choose country to play", cell: props });
     }
-    console.log(state);
+    console.log(state, props);
   };
 
   return (
@@ -639,7 +637,7 @@ function TableCell(props) {
             style={{ position: "absolute" }}
             onClick={() => fun_clickCity(props)}
           >
-            <LocationCityIcon style={{ fontSize: "4.2rem" }} />
+            <LocationCityIcon style={{ fontSize: "4.2rem", color: "blue" }} />
           </div>
         ) : null}
       </div>
