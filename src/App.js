@@ -56,6 +56,7 @@ function reducer(state, action) {
           }),
         },
         playerStep: "play",
+        army: action.army,
       };
     default:
       throw new Error();
@@ -72,6 +73,14 @@ function shuffle(array) {
   }
   return array;
 }
+function positionReturn(x, y) {
+  let element = document.querySelector(".x" + x + "_y" + y);
+  console.log(element.getBoundingClientRect().x + window.scrollX);
+  return {
+    x: element.getBoundingClientRect().x + window.scrollX + 8,
+    y: element.getBoundingClientRect().y + window.scrollY - 12,
+  };
+}
 function App() {
   const [radius, setRadius] = useState(2); //2
   const [diameter, setDiameter] = useState(5); //radius*2+1
@@ -81,6 +90,7 @@ function App() {
     country: [],
     table: [],
     people: [],
+    army: [],
   });
   useEffect(() => {
     console.log("test");
@@ -317,6 +327,7 @@ function App() {
     } else if (random_number === 3) {
       add_object.long_attack = randomIntFromInterval(40, 100);
     }
+
     return add_object;
   };
 
@@ -360,6 +371,7 @@ function App() {
           city: city,
           control: [],
           seen: [],
+          own: {},
         };
         if (city) {
           //add cityName
@@ -427,13 +439,16 @@ function App() {
           people.push({
             ...people_push,
             name: people_push.firstName + people_push.secondName,
+            id: people.length,
           });
+
           //add control
           row_array_push = {
             ...row_array_push,
             control: [
               { name: country_push.name, id: country_push.id, number: 100 },
             ],
+            own: { name: country_push.name, id: country_push.id },
           };
           //add seen
           row_array_push = {
@@ -587,6 +602,23 @@ function App() {
                     ))}
                   </tbody>
                 </table>
+                {state.army.map((row, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      position: "absolute",
+                      top: row.top,
+                      left: row.left,
+                      opacity: 0.85,
+                      width: 60,
+                      height: 60,
+                      background: "white",
+                      borderRadius: "50%",
+                    }}
+                  >
+                    test
+                  </div>
+                ))}
               </div>
             </div>
           ) : null}
@@ -602,8 +634,27 @@ function TableCell(props) {
 
   const fun_clickCity = (props) => {
     if (state.playerStep === "choose country") {
+      let army = [];
       //make table array add solider
-      dispatch({ type: "change choose country to play", cell: props });
+      for (let i = 0; i < state.country.length; i++) {
+        let army_position = positionReturn(
+          state.country[i].firstCity.x,
+          state.country[i].firstCity.y
+        );
+        army.push({
+          id: army.length,
+          people_id: army.length,
+          x: state.country[i].firstCity.x,
+          y: state.country[i].firstCity.y,
+          top: army_position.y,
+          left: army_position.x,
+        });
+      }
+      dispatch({
+        type: "change choose country to play",
+        cell: props,
+        army: army,
+      });
     }
     console.log(state, props);
   };
@@ -630,14 +681,19 @@ function TableCell(props) {
           justifyContent: "center",
           alignItems: "center",
         }}
-        className="cell"
+        className={"cell x" + props.x + "_y" + props.y}
       >
         {props.city ? (
           <div
             style={{ position: "absolute" }}
             onClick={() => fun_clickCity(props)}
           >
-            <LocationCityIcon style={{ fontSize: "4.2rem", color: "blue" }} />
+            <LocationCityIcon
+              style={{
+                ...{ fontSize: "4.2rem" },
+                ...{ color: state.country[props.own["id"]].ai ? "" : "blue" },
+              }}
+            />
           </div>
         ) : null}
       </div>
