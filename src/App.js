@@ -73,12 +73,26 @@ function shuffle(array) {
   }
   return array;
 }
-function positionReturn(x, y) {
+/**
+ *
+ * @param {Integer} x
+ * @param {Integer} y
+ */
+function positionReturn(x = 1, y = 1) {
   let element = document.querySelector(".x" + x + "_y" + y);
-  console.log(element.getBoundingClientRect().x + window.scrollX);
+  let px_x =
+    element.getBoundingClientRect().x +
+    window.scrollX +
+    10 +
+    (element.matches(":hover") ? 0 : -2);
+  let px_y =
+    element.getBoundingClientRect().y +
+    window.scrollY -
+    12 +
+    (element.matches(":hover") ? 0 : -2);
   return {
-    x: element.getBoundingClientRect().x + window.scrollX + 8,
-    y: element.getBoundingClientRect().y + window.scrollY - 12,
+    x: parseInt(px_x),
+    y: parseInt(px_y),
   };
 }
 function App() {
@@ -158,7 +172,23 @@ function App() {
     "蜀",
     "巴",
     "苴",
-  ]; //52
+    "殷",
+    "鄢",
+    "密",
+    "胡",
+    "焦",
+    "共",
+    "凡",
+    "葛",
+    "謝",
+    "申",
+    "呂",
+    "蓼",
+    "潘",
+    "弦",
+    "偪",
+    "光",
+  ]; //68
   const peopleFirstNameArray = [
     "姬",
     "嬴",
@@ -167,7 +197,6 @@ function App() {
     "熊",
     "子",
     "姜",
-    "呂",
     "田",
     "媯",
     "己",
@@ -189,6 +218,7 @@ function App() {
     "谷",
     "兒",
     "媿",
+    "姚",
   ]; //29
   const peopleSecondNameArray = [
     "鯀",
@@ -221,7 +251,6 @@ function App() {
     "摯",
     "辯",
     "高",
-    "密",
     "伷",
     "莊",
     "發",
@@ -253,7 +282,6 @@ function App() {
     "滿",
     "囏",
     "燮",
-    "胡",
     "靜",
     "棄",
     "鞠",
@@ -291,7 +319,20 @@ function App() {
     "亹",
     "嬰",
     "足",
-  ]; //100
+    "仲",
+    "傒",
+    "朋",
+    "虎",
+    "巫",
+    "燬",
+    "固",
+    "克",
+    "牽",
+    "蠆",
+    "灶",
+    "完",
+    "乞",
+  ]; //111
   /**
    * return object, use for createTable
    * @param {boolean} city
@@ -330,7 +371,9 @@ function App() {
 
     return add_object;
   };
-
+  const fun_clickArmy = (props) => {
+    console.log(props, "test");
+  };
   useEffect(() => {
     console.log("mounted", rowCountry, radius);
   });
@@ -605,18 +648,16 @@ function App() {
                 {state.army.map((row, index) => (
                   <div
                     key={index}
+                    className="army"
                     style={{
-                      position: "absolute",
                       top: row.top,
                       left: row.left,
-                      opacity: 0.85,
-                      width: 60,
-                      height: 60,
-                      background: "white",
-                      borderRadius: "50%",
+                      border: "5px solid " + row.color,
+                      lineHeight: "48px",
                     }}
+                    onClick={() => fun_clickArmy(row)}
                   >
-                    test
+                    {state.people[row.people_id].name}
                   </div>
                 ))}
               </div>
@@ -648,6 +689,13 @@ function TableCell(props) {
           y: state.country[i].firstCity.y,
           top: army_position.y,
           left: army_position.x,
+          color:
+            state.country[state.people[army.length].countryId].firstCity.x ===
+              props.x &&
+            state.country[state.people[army.length].countryId].firstCity.y ===
+              props.y
+              ? "blue"
+              : "white",
         });
       }
       dispatch({
@@ -682,12 +730,10 @@ function TableCell(props) {
           alignItems: "center",
         }}
         className={"cell x" + props.x + "_y" + props.y}
+        onClick={() => (props.city ? fun_clickCity(props) : null)}
       >
         {props.city ? (
-          <div
-            style={{ position: "absolute" }}
-            onClick={() => fun_clickCity(props)}
-          >
+          <div style={{ position: "absolute" }}>
             <LocationCityIcon
               style={{
                 ...{ fontSize: "4.2rem" },
