@@ -99,12 +99,14 @@ function App() {
   const [radius, setRadius] = useState(2); //2
   const [diameter, setDiameter] = useState(5); //radius*2+1
   const [rowCountry, setRowCountry] = useState(3); //3
+  const [runDownSetting, setRunDownSetting] = useState("userFirst"); //userFirst,aiFirst,random
   const [state, dispatch] = useReducer(reducer, {
     playerStep: "enter game",
     country: [],
     table: [],
     people: [],
     army: [],
+    runDown: [],
   });
   useEffect(() => {
     console.log("test");
@@ -182,13 +184,30 @@ function App() {
     "葛",
     "謝",
     "申",
-    "呂",
     "蓼",
     "潘",
     "弦",
     "偪",
     "光",
-  ]; //68
+    "滑",
+    "江",
+    "邘",
+    "蔣",
+    "邶",
+    "祭",
+    "道",
+    "柏",
+    "胙",
+    "雍",
+    "項",
+    "頓",
+    "管",
+    "檀",
+    "房",
+    "莘",
+    "許",
+    "韋",
+  ]; //85
   const peopleFirstNameArray = [
     "姬",
     "嬴",
@@ -204,7 +223,6 @@ function App() {
     "蘇",
     "邵",
     "駱",
-    "任",
     "妘",
     "禹",
     "妊",
@@ -219,7 +237,15 @@ function App() {
     "兒",
     "媿",
     "姚",
-  ]; //29
+    "呂",
+    "晏",
+    "崔",
+    "高",
+    "郭",
+    "莊",
+    "張",
+    "輔",
+  ]; //36
   const peopleSecondNameArray = [
     "鯀",
     "禹",
@@ -250,9 +276,7 @@ function App() {
     "微",
     "摯",
     "辯",
-    "高",
     "伷",
-    "莊",
     "發",
     "整",
     "滕",
@@ -332,7 +356,11 @@ function App() {
     "灶",
     "完",
     "乞",
-  ]; //111
+    "山",
+    "撝",
+    "白",
+    "盈",
+  ]; //113
   /**
    * return object, use for createTable
    * @param {boolean} city
@@ -398,7 +426,6 @@ function App() {
               city = true;
             }
           } else if (randomNo2 === 2) {
-            console.log(j % diameter, parseInt(diameter / 2) + 1);
             if ((j - 1) % diameter === parseInt(diameter / 2) + 1) {
               city = true;
             }
@@ -415,6 +442,7 @@ function App() {
           control: [],
           seen: [],
           own: {},
+          color: "black",
         };
         if (city) {
           //add cityName
@@ -452,6 +480,7 @@ function App() {
             firstCity: { x: j, y: i },
             ai: true,
             kingFirstName: copy_add_peopleFirstNameArray.pop(),
+            city: [{ x: j, y: i }],
           };
 
           country.push(country_push);
@@ -513,11 +542,40 @@ function App() {
           city: city,
           control: [],
           seen: [],
+          own: {},
+          color: "black",
         });
       }
       table_array.push(row_array);
     }
     console.log(people);
+    //to make table own,seen,control
+    for (let k = 0; k < country.length; k++) {
+      console.log(country[k].firstCity.x, country[k].firstCity.y);
+      let insert_obj = { name: country[k].name, id: country[k].id };
+      let table_own = [
+        [country[k].firstCity.y - 1, country[k].firstCity.x - 2],
+        [country[k].firstCity.y - 1, country[k].firstCity.x],
+      ]; //left,right,top-left,top-right,down-left,down-right
+
+      if (country[k].firstCity.y % 2 === 1) {
+        table_own.push(
+          ...[
+            [country[k].firstCity.y - 2, country[k].firstCity.x],
+            [country[k].firstCity.y - 2, country[k].firstCity.x + 1],
+            [country[k].firstCity.y, country[k].firstCity.x],
+            [country[k].firstCity.y, country[k].firstCity.x + 1],
+          ]
+        );
+      }
+      for (let m = 0; m < table_own.length; m++) {
+        table_array[table_own[m][0]][table_own[m][1]].own = insert_obj;
+        table_array[table_own[m][0]][table_own[m][1]].control = [
+          { ...insert_obj, number: 100 },
+        ];
+        table_array[table_own[m][0]][table_own[m][1]].seen = [k];
+      }
+    }
     dispatch({
       country: country,
       table: table_array,
@@ -718,16 +776,8 @@ function TableCell(props) {
     >
       <div
         style={{
-          width: 74,
-          height: 74,
-          position: "absolute",
-          top: 3,
-          left: 3,
-          border: "1px solid black",
+          border: "1px solid " + props.color,
           background: props.background,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
         }}
         className={"cell x" + props.x + "_y" + props.y}
         onClick={() => (props.city ? fun_clickCity(props) : null)}
