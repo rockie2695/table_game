@@ -57,6 +57,7 @@ function reducer(state, action) {
         },
         playerStep: "play",
         army: action.army,
+        table: action.table,
       };
     default:
       throw new Error();
@@ -83,7 +84,7 @@ function positionReturn(x = 1, y = 1) {
   let px_x =
     element.getBoundingClientRect().x +
     window.scrollX +
-    10 +
+    -170 +
     (element.matches(":hover") ? 0 : -2);
   let px_y =
     element.getBoundingClientRect().y +
@@ -561,10 +562,19 @@ function App() {
       if (country[k].firstCity.y % 2 === 1) {
         table_own.push(
           ...[
+            [country[k].firstCity.y - 2, country[k].firstCity.x - 1],
             [country[k].firstCity.y - 2, country[k].firstCity.x],
-            [country[k].firstCity.y - 2, country[k].firstCity.x + 1],
+            [country[k].firstCity.y, country[k].firstCity.x - 1],
             [country[k].firstCity.y, country[k].firstCity.x],
-            [country[k].firstCity.y, country[k].firstCity.x + 1],
+          ]
+        );
+      } else {
+        table_own.push(
+          ...[
+            [country[k].firstCity.y - 2, country[k].firstCity.x - 2],
+            [country[k].firstCity.y - 2, country[k].firstCity.x - 1],
+            [country[k].firstCity.y, country[k].firstCity.x - 2],
+            [country[k].firstCity.y, country[k].firstCity.x - 1],
           ]
         );
       }
@@ -638,12 +648,10 @@ function App() {
               <div
                 style={{
                   background: cliff_color,
-                  width: (diameter * rowCountry + 1) * 80 + 20,
-                  height: diameter * rowCountry * 80 + 20,
-                  minHeight: diameter * rowCountry * 80 + 20,
-                  maxHeight: diameter * rowCountry * 80 + 20,
+                  padding: 10,
                   display: "table-cell",
                   verticalAlign: "middle",
+                  position: "relative",
                 }}
               >
                 <table
@@ -756,10 +764,22 @@ function TableCell(props) {
               : "white",
         });
       }
+
+      for (let i = 0; i < state.table.length; i++) {
+        for (let j = 0; j < state.table[i].length; j++) {
+          if (
+            typeof state.table[i][j].own.id !== "undefined" &&
+            state.table[i][j].own.id === props.own.id
+          ) {
+            state.table[i][j].color = "blue";
+          }
+        }
+      }
       dispatch({
         type: "change choose country to play",
         cell: props,
         army: army,
+        table: state.table,
       });
     }
     console.log(state, props);
@@ -776,7 +796,10 @@ function TableCell(props) {
     >
       <div
         style={{
-          border: "1px solid " + props.color,
+          border:
+            props.color !== "black"
+              ? "2px dashed " + props.color
+              : "0.5px solid " + props.color,
           background: props.background,
         }}
         className={"cell x" + props.x + "_y" + props.y}
