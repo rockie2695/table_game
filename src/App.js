@@ -81,11 +81,16 @@ function shuffle(array) {
  */
 function positionReturn(x = 1, y = 1) {
   let element = document.querySelector(".x" + x + "_y" + y);
+  let parent_element =
+    element.parentElement.parentElement.parentElement.parentElement
+      .parentElement;
+  console.log(element.getBoundingClientRect(), element.offsetLeft);
   let px_x =
     element.getBoundingClientRect().x +
     window.scrollX +
-    -170 +
-    (element.matches(":hover") ? 0 : -2);
+    10 +
+    (element.matches(":hover") ? 0 : -2) -
+    parent_element.getBoundingClientRect().x;
   let px_y =
     element.getBoundingClientRect().y +
     window.scrollY -
