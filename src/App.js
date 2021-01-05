@@ -595,6 +595,7 @@ function App() {
       country: country,
       table: table_array,
       people: people,
+      runDownSetting: runDownSetting,
       type: "change playerStep to choose country",
     });
     console.log(state);
