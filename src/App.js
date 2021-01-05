@@ -40,6 +40,7 @@ function reducer(state, action) {
         country: action.country,
         table: action.table,
         people: action.people,
+        runDownSetting: action.runDownSetting,
       };
     case "change choose country to play":
       return {
@@ -590,6 +591,10 @@ function App() {
         ];
         table_array[table_own[m][0]][table_own[m][1]].seen = [k];
       }
+    }
+    if (state.runDownSetting === "userFirst") {
+    } else if (state.runDownSetting === "aiFirst") {
+    } else if (state.runDownSetting === "random") {
     }
     dispatch({
       country: country,
