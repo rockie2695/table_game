@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useReducer, useContext } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useReducer,
+  useContext,
+} from "react";
 import "./App.css";
 import { Fragment } from "react";
 import LocationCityIcon from "@material-ui/icons/LocationCity";
@@ -60,6 +66,11 @@ function reducer(state, action) {
         army: action.army,
         table: action.table,
       };
+    case "change rum down list":
+      return {
+        ...state,
+        runDown: action.runDown,
+      };
     default:
       throw new Error();
   }
@@ -85,7 +96,6 @@ function positionReturn(x = 1, y = 1) {
   let parent_element =
     element.parentElement.parentElement.parentElement.parentElement
       .parentElement;
-  console.log(element.getBoundingClientRect(), element.offsetLeft);
   let px_x =
     element.getBoundingClientRect().x +
     window.scrollX +
@@ -555,10 +565,8 @@ function App() {
       }
       table_array.push(row_array);
     }
-    console.log(people);
     //to make table own,seen,control
     for (let k = 0; k < country.length; k++) {
-      console.log(country[k].firstCity.x, country[k].firstCity.y);
       let insert_obj = { name: country[k].name, id: country[k].id };
       let table_own = [
         [country[k].firstCity.y - 1, country[k].firstCity.x - 2],
@@ -592,10 +600,7 @@ function App() {
         table_array[table_own[m][0]][table_own[m][1]].seen = [k];
       }
     }
-    if (state.runDownSetting === "userFirst") {
-    } else if (state.runDownSetting === "aiFirst") {
-    } else if (state.runDownSetting === "random") {
-    }
+
     dispatch({
       country: country,
       table: table_array,
@@ -603,7 +608,6 @@ function App() {
       runDownSetting: runDownSetting,
       type: "change playerStep to choose country",
     });
-    console.log(state);
   };
   /*
   123456789
@@ -749,6 +753,8 @@ function App() {
 function TableCell(props) {
   const dispatch = useContext(DispatchContext);
   const state = useContext(StateContext);
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   const fun_clickCity = (props) => {
     if (state.playerStep === "choose country") {
@@ -786,14 +792,37 @@ function TableCell(props) {
           }
         }
       }
+
       dispatch({
         type: "change choose country to play",
         cell: props,
         army: army,
         table: state.table,
       });
+      setTimeout(() => {
+        runDownMaking();
+      }, 0);
+    } else {
+      console.log(state);
     }
-    console.log(state, props);
+  };
+
+  const runDownMaking = () => {
+    let pre_country = [...stateRef.current.country];
+    let user_index = pre_country.findIndex((element) => element.ai === false);
+    if (stateRef.current.runDownSetting === "userFirst") {
+      let removed = pre_country.splice(user_index, 1);
+      pre_country = [...removed, ...shuffle(pre_country)];
+    } else if (stateRef.current.runDownSetting === "aiFirst") {
+      let removed = pre_country.splice(user_index, 1);
+      pre_country = [...shuffle(pre_country), ...removed];
+    } else if (stateRef.current.runDownSetting === "random") {
+      pre_country = shuffle(pre_country);
+    }
+    dispatch({
+      type: "change rum down list",
+      runDown: pre_country,
+    });
   };
 
   return (
