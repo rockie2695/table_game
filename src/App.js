@@ -12,6 +12,7 @@ import amber from "@material-ui/core/colors/amber";
 import green from "@material-ui/core/colors/green";
 import brown from "@material-ui/core/colors/brown";
 import grey from "@material-ui/core/colors/grey";
+import blue from "@material-ui/core/colors/blue";
 
 /*
 https://tecky.io/en/blog/%E5%88%B0%E5%BA%95react-hooks%E6%9C%89%E4%BD%95%E7%89%B9%E5%88%A5-%E4%BA%8C-%E6%B7%BA%E8%AB%87useeffect%E5%8F%8Ausereducer/
@@ -27,6 +28,7 @@ const land_color = amber[500];
 const tree_color = green[500];
 const mountain_color = brown[500];
 const cliff_color = grey[500];
+const self_color = blue[500];
 /**
  * random Integer
  * @param {number} min
@@ -777,7 +779,7 @@ function TableCell(props) {
               props.x &&
             state.country[state.people[army.length].countryId].firstCity.y ===
               props.y
-              ? "blue"
+              ? self_color
               : "white",
         });
       }
@@ -788,7 +790,7 @@ function TableCell(props) {
             typeof state.table[i][j].own.id !== "undefined" &&
             state.table[i][j].own.id === props.own.id
           ) {
-            state.table[i][j].color = "blue";
+            state.table[i][j].color = self_color;
           }
         }
       }
@@ -850,7 +852,9 @@ function TableCell(props) {
             <LocationCityIcon
               style={{
                 ...{ fontSize: "4.2rem" },
-                ...{ color: state.country[props.own["id"]].ai ? "" : "blue" },
+                ...{
+                  color: state.country[props.own["id"]].ai ? "" : self_color,
+                },
               }}
             />
           </div>
