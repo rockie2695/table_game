@@ -73,6 +73,23 @@ function reducer(state, action) {
         ...state,
         runDown: action.runDown,
       };
+    case "cellMouseEventOver":
+      return {
+        ...state,
+        mouseOverObj: { ...action.mouseOverObj, objType: "cell" },
+      };
+    case "cellMouseEventOut":
+      let addObj = state.mouseOverObj;
+      if (
+        state.mouseOverObj.x === action.mouseOverObj.x &&
+        state.mouseOverObj.y === action.mouseOverObj.y
+      ) {
+        addObj = { mouseOverObj: {} };
+      }
+      return {
+        ...state,
+        ...addObj,
+      };
     default:
       throw new Error();
   }
@@ -126,6 +143,7 @@ function App() {
     people: [],
     army: [],
     runDown: [],
+    mouseOverObj: {},
   });
   useEffect(() => {
     console.log("test");
@@ -746,6 +764,22 @@ function App() {
               </div>
             </div>
           ) : null}
+          {typeof state.mouseOverObj.objType !== "undefined" ? (
+            <div
+              style={{
+                width: "100%",
+                background: "white",
+                position: "fixed",
+                bottom: 0,
+              }}
+            >
+              {state.mouseOverObj.objType === "cell"
+                ? state.mouseOverObj.city
+                  ? "city :" + state.mouseOverObj.cityName
+                  : "land"
+                : "army"}
+            </div>
+          ) : null}
         </div>
       </StateContext.Provider>
     </DispatchContext.Provider>
@@ -757,6 +791,22 @@ function TableCell(props) {
   const state = useContext(StateContext);
   const stateRef = useRef(state);
   stateRef.current = state;
+
+  const fun_cellMouseOut = (props) => {
+    console.log(props, "out");
+    dispatch({
+      type: "cellMouseEventOut",
+      mouseOverObj: props,
+    });
+  };
+
+  const fun_cellMouseOver = (props) => {
+    console.log(props, "over");
+    dispatch({
+      type: "cellMouseEventOver",
+      mouseOverObj: props,
+    });
+  };
 
   const fun_clickCity = (props) => {
     if (state.playerStep === "choose country") {
@@ -791,6 +841,8 @@ function TableCell(props) {
             state.table[i][j].own.id === props.own.id
           ) {
             state.table[i][j].color = self_color;
+          } else if (typeof state.table[i][j].own.id !== "undefined") {
+            state.table[i][j].color = "white";
           }
         }
       }
@@ -846,6 +898,12 @@ function TableCell(props) {
         }}
         className={"cell x" + props.x + "_y" + props.y}
         onClick={() => (props.city ? fun_clickCity(props) : null)}
+        onMouseOver={() => {
+          fun_cellMouseOver(props);
+        }}
+        onMouseOut={() => {
+          fun_cellMouseOut(props);
+        }}
       >
         {props.city ? (
           <div style={{ position: "absolute" }}>
