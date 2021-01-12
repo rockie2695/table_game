@@ -13,6 +13,8 @@ import green from "@material-ui/core/colors/green";
 import brown from "@material-ui/core/colors/brown";
 import grey from "@material-ui/core/colors/grey";
 import blue from "@material-ui/core/colors/blue";
+import Paper from "@material-ui/core/Paper";
+import Grid from "@material-ui/core/Grid";
 
 /*
 https://tecky.io/en/blog/%E5%88%B0%E5%BA%95react-hooks%E6%9C%89%E4%BD%95%E7%89%B9%E5%88%A5-%E4%BA%8C-%E6%B7%BA%E8%AB%87useeffect%E5%8F%8Ausereducer/
@@ -767,18 +769,36 @@ function App() {
           {typeof state.mouseOverObj.objType !== "undefined" ? (
             <div
               style={{
-                width: "100%",
+                width: "calc(100% - 4px)",
                 background: "white",
                 position: "fixed",
                 bottom: 0,
                 textAlign: "left",
+                height: 100,
+                border: "2px solid black",
               }}
             >
-              {state.mouseOverObj.objType === "cell"
-                ? state.mouseOverObj.city
-                  ? "city :" + state.mouseOverObj.cityName
-                  : "land"
-                : "army"}
+              <div style={{ padding: 16 }}>
+                {
+                  <Grid container item xs={12} spacing={3}>
+                    <Grid item xs={4}>
+                      <div>
+                        {state.mouseOverObj.objType === "cell"
+                          ? state.mouseOverObj.city
+                            ? "city :" + state.mouseOverObj.cityName
+                            : "land"
+                          : "army"}
+                      </div>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <div>control</div>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <div></div>
+                    </Grid>
+                  </Grid>
+                }
+              </div>
             </div>
           ) : null}
         </div>
