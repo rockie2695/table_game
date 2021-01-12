@@ -771,6 +771,7 @@ function App() {
                 background: "white",
                 position: "fixed",
                 bottom: 0,
+                textAlign: "left",
               }}
             >
               {state.mouseOverObj.objType === "cell"
