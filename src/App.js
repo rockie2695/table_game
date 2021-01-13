@@ -82,16 +82,18 @@ function reducer(state, action) {
       };
     case "cellMouseEventOut":
       let addObj = state.mouseOverObj;
-      if (
+      /*if (
         state.mouseOverObj.x === action.mouseOverObj.x &&
         state.mouseOverObj.y === action.mouseOverObj.y
-      ) {
-        addObj = { mouseOverObj: {} };
-      }
+      ) {*/
+      addObj = { mouseOverObj: {} };
+      //}
       return {
         ...state,
         ...addObj,
       };
+    case "clickSelect":
+      return { ...state, clickSelect: !state.clickSelect };
     default:
       throw new Error();
   }
@@ -146,6 +148,7 @@ function App() {
     army: [],
     runDown: [],
     mouseOverObj: {},
+    clickSelect: false,
   });
   useEffect(() => {
     console.log("test");
@@ -782,19 +785,60 @@ function App() {
                 {
                   <Grid container item xs={12} spacing={3}>
                     <Grid item xs={4}>
-                      <div>
-                        {state.mouseOverObj.objType === "cell"
-                          ? state.mouseOverObj.city
-                            ? "city :" + state.mouseOverObj.cityName
-                            : "land"
-                          : "army"}
-                      </div>
+                      <Grid container item xs={12}>
+                        <Grid item xs={3}>
+                          {state.mouseOverObj.objType === "cell"
+                            ? state.mouseOverObj.city
+                              ? "cityName : "
+                              : "land : "
+                            : "army : "}
+                        </Grid>
+                        <Grid item xs={9}>
+                          {state.mouseOverObj.objType === "cell"
+                            ? state.mouseOverObj.city
+                              ? state.mouseOverObj.cityName
+                              : state.mouseOverObj.land === 0
+                              ? "平原"
+                              : state.mouseOverObj.land === 1
+                              ? "森林"
+                              : state.mouseOverObj.land === 2
+                              ? "山脈"
+                              : state.mouseOverObj.land === 4
+                              ? "懸崖"
+                              : ""
+                            : ""}
+                        </Grid>
+                      </Grid>
                     </Grid>
                     <Grid item xs={4}>
-                      <div>control</div>
+                      <Grid container item xs={12}>
+                        <Grid item xs={3}>
+                          control
+                        </Grid>
+                        <Grid item xs={9}>
+                          {Object.keys(state.mouseOverObj.control).length !== 0
+                            ? state.mouseOverObj.control.map((item, i) => {
+                                return (
+                                  <div key={i}>
+                                    {item.name + "(" + item.number + ")"}
+                                  </div>
+                                );
+                              })
+                            : ""}
+                        </Grid>
+                      </Grid>
                     </Grid>
                     <Grid item xs={4}>
-                      <div></div>
+                      <Grid container item xs={12}>
+                        <Grid item xs={3}>
+                          own
+                        </Grid>
+                        <Grid item xs={9}>
+                          {Object.keys(state.mouseOverObj.own).length !== 0
+                            ? state.mouseOverObj.own.name
+                            : ""}
+                        </Grid>
+                      </Grid>
                     </Grid>
                   </Grid>
                 }
@@ -814,21 +858,33 @@ function TableCell(props) {
   stateRef.current = state;
 
   const fun_cellMouseOut = (props) => {
-    console.log(props, "out");
-    dispatch({
-      type: "cellMouseEventOut",
-      mouseOverObj: props,
-    });
+    if (
+      state.mouseOverObj.x === props.x &&
+      state.mouseOverObj.y === props.y &&
+      !state.clickSelect
+    ) {
+      console.log(props, "out");
+      dispatch({
+        type: "cellMouseEventOut",
+        mouseOverObj: props,
+      });
+    }
   };
 
   const fun_cellMouseOver = (props) => {
-    console.log(props, "over");
-    dispatch({
-      type: "cellMouseEventOver",
-      mouseOverObj: props,
-    });
+    if (
+      Object.keys(state.mouseOverObj).length === 0 ||
+      (state.mouseOverObj.x !== props.x &&
+        state.mouseOverObj.y !== props.y &&
+        !state.clickSelect)
+    ) {
+      console.log(props, "over");
+      dispatch({
+        type: "cellMouseEventOver",
+        mouseOverObj: props,
+      });
+    }
   };
-
   const fun_clickCity = (props) => {
     if (state.playerStep === "choose country") {
       let army = [];
@@ -879,6 +935,9 @@ function TableCell(props) {
       }, 0);
     } else {
       console.log(state);
+      dispatch({
+        type: "clickSelect",
+      });
     }
   };
 
